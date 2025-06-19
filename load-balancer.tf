@@ -1,6 +1,8 @@
-# Application Load Balancer
-resource "aws_lb" "main" {
-  name               = "${var.project_name}-alb"
+
+
+# Load Balancer para Microservices (NOME ENCURTADO)
+resource "aws_lb" "microservices" {
+  name               = "rogerio-micro-alb"  # ENCURTADO
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
@@ -9,17 +11,18 @@ resource "aws_lb" "main" {
   enable_deletion_protection = false
 
   tags = {
-    Name        = "${var.project_name}-alb"
+    Name        = "${var.project_name}-microservices-alb"
     Environment = var.environment
   }
 }
 
-# Target Group
-resource "aws_lb_target_group" "web" {
-  name     = "${var.project_name}-tg"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main.id
+# Target Groups para Microservices (NOMES ENCURTADOS)
+resource "aws_lb_target_group" "user_service" {
+  name        = "rogerio-user-tg"  # ENCURTADO
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main.id
+  target_type = "ip"
 
   health_check {
     enabled             = true
@@ -34,19 +37,82 @@ resource "aws_lb_target_group" "web" {
   }
 
   tags = {
-    Name        = "${var.project_name}-tg"
+    Name        = "${var.project_name}-user-tg"
     Environment = var.environment
   }
 }
 
-# Listener
-resource "aws_lb_listener" "web" {
-  load_balancer_arn = aws_lb.main.arn
+resource "aws_lb_target_group" "order_service" {
+  name        = "rogerio-order-tg"  # ENCURTADO
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main.id
+  target_type = "ip"
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    interval            = 30
+    matcher             = "200"
+    path                = "/"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+    timeout             = 5
+    unhealthy_threshold = 2
+  }
+
+  tags = {
+    Name        = "${var.project_name}-order-tg"
+    Environment = var.environment
+  }
+}
+
+# Listener para Microservices
+resource "aws_lb_listener" "microservices" {
+  load_balancer_arn = aws_lb.microservices.arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Microservices Gateway - Choose /users or /orders"
+      status_code  = "200"
+    }
+  }
+}
+
+# Rules para rotear por path
+resource "aws_lb_listener_rule" "user_service" {
+  listener_arn = aws_lb_listener.microservices.arn
+  priority     = 100
+
+  action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.web.arn
+    target_group_arn = aws_lb_target_group.user_service.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/users/*", "/users"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "order_service" {
+  listener_arn = aws_lb_listener.microservices.arn
+  priority     = 200
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.order_service.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/orders/*", "/orders"]
+    }
   }
 }

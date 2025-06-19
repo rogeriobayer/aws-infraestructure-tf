@@ -1,12 +1,3 @@
-output "load_balancer_dns" {
-  description = "DNS do Application Load Balancer"
-  value       = aws_lb.main.dns_name
-}
-
-output "load_balancer_zone_id" {
-  description = "Zone ID do Load Balancer"
-  value       = aws_lb.main.zone_id
-}
 
 output "database_endpoint" {
   description = "Endpoint do banco de dados RDS"
@@ -34,7 +25,14 @@ output "private_subnet_ids" {
   value       = aws_subnet.private[*].id
 }
 
-output "application_url" {
-  description = "URL da aplicação"
-  value       = "http://${aws_lb.main.dns_name}"
+output "microservices_url" {
+  description = "URL dos microservices"
+  value       = "http://${aws_lb.microservices.dns_name}"
+}
+
+
+
+output "ecs_cluster_name" {
+  description = "Nome do cluster ECS"
+  value       = aws_ecs_cluster.microservices.name
 }
