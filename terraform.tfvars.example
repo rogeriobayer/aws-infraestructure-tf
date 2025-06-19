@@ -1,5 +1,5 @@
 
-aws_region    = "us-east-1"
+aws_region    = "us-east-2"
 project_name  = "rogerio-aws-infrastructure"
 environment   = "dev"
 instance_type = "t3.micro"

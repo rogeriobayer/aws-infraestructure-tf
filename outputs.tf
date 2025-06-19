@@ -1,4 +1,3 @@
-
 output "database_endpoint" {
   description = "Endpoint do banco de dados RDS"
   value       = aws_db_instance.main.endpoint
@@ -30,9 +29,12 @@ output "microservices_url" {
   value       = "http://${aws_lb.microservices.dns_name}"
 }
 
+output "user_service_ip" {
+  description = "IP público do User Service"
+  value       = aws_instance.user_service_new.public_ip
+}
 
-
-output "ecs_cluster_name" {
-  description = "Nome do cluster ECS"
-  value       = aws_ecs_cluster.microservices.name
+output "order_service_ip" {
+  description = "IP público do Order Service"
+  value       = aws_instance.order_service_new.public_ip
 }

@@ -101,10 +101,10 @@ resource "aws_security_group" "rds" {
   }
 }
 
-# Security Group para Microservices (ECS)
+# Security Group para Microservices (EC2)
 resource "aws_security_group" "microservices" {
   name        = "${var.project_name}-msg"
-  description = "Security group para microservices ECS"
+  description = "Security group para microservices EC2"
   vpc_id      = aws_vpc.main.id
 
   ingress {

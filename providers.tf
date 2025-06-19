@@ -11,3 +11,13 @@ terraform {
 provider "aws" {
   region = var.aws_region
 }
+
+terraform {
+  backend "s3" {  
+    bucket         = "rogerio-terraform-state-bucket" 
+    key            = "terraform.tfstate"                    
+    region         = "us-east-2"                            
+    encrypt        = true                                  
+  }
+}
+

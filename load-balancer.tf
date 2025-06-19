@@ -1,8 +1,6 @@
-
-
-# Load Balancer para Microservices (NOME ENCURTADO)
+# Load Balancer para Microservices 
 resource "aws_lb" "microservices" {
-  name               = "rogerio-micro-alb"  # ENCURTADO
+  name               = "rogerio-micro-alb"  
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
@@ -16,13 +14,13 @@ resource "aws_lb" "microservices" {
   }
 }
 
-# Target Groups para Microservices (NOMES ENCURTADOS)
+# Target Groups para Microservices
 resource "aws_lb_target_group" "user_service" {
-  name        = "rogerio-user-tg"  # ENCURTADO
+  name        = "rogerio-user-tg"  
   port        = 80
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
-  target_type = "ip"
+  target_type = "instance"
 
   health_check {
     enabled             = true
@@ -32,8 +30,8 @@ resource "aws_lb_target_group" "user_service" {
     path                = "/"
     port                = "traffic-port"
     protocol            = "HTTP"
-    timeout             = 5
-    unhealthy_threshold = 2
+    timeout             = 10
+    unhealthy_threshold = 3
   }
 
   tags = {
@@ -43,11 +41,11 @@ resource "aws_lb_target_group" "user_service" {
 }
 
 resource "aws_lb_target_group" "order_service" {
-  name        = "rogerio-order-tg"  # ENCURTADO
+  name        = "rogerio-order-tg"  
   port        = 80
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
-  target_type = "ip"
+  target_type = "instance"
 
   health_check {
     enabled             = true
@@ -57,8 +55,8 @@ resource "aws_lb_target_group" "order_service" {
     path                = "/"
     port                = "traffic-port"
     protocol            = "HTTP"
-    timeout             = 5
-    unhealthy_threshold = 2
+    timeout             = 10
+    unhealthy_threshold = 3
   }
 
   tags = {
